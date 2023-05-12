@@ -583,3 +583,33 @@ function running() {
 const myObject = new MyFunction("Bhavuk", "25", ["Hindi", "English"], running);
 ```
 
+
+
+## Console
+
+### Console.time
+
+This can be used to calculate the time taken by some instructions to execute.
+
+```javascript
+const timeDatabaseWrite = "Database_Write";
+
+console.time(timeDatabaseWrite);	// start time
+
+writeToDatabase(myItem);
+console.timeEnd(timeDatabaseWrite);	// total time conceded.
+```
+
+
+
+### console.trace
+
+This is useful for debugging purposes. With this call we can print extra information like at which line the function was called, which function called it etc. This is also helpful if we called a function twice, we don't intend to.
+
+```javascript
+function addToDatabase(item) {
+    console.trace('deleting item from database');
+    database.add(item);
+}
+```
+

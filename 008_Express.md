@@ -155,6 +155,71 @@ app.post('/register', (req, res) => {
 
 
 
+## Handle delete Requests
+
+```javascript
+app.delete('/blogs/:blogName', (req, res) => {
+    if (deleteBlog(req.param.blogName)) {
+    	res.send("Blog deleted")
+    }
+});
+```
+
+We can delete items with delete requests.
+
+
+
+## Put and Patch Request
+
+Think we have a document like below
+
+```json
+{
+    title: "Mars",
+    content: "Moon is a natural satellite of Earth! It rotates around Earth and completes a single rotation in 30 days"
+}
+```
+
+In above document we have object title as Mars but it's content is of moon. Now we need to update the document to make it right. 
+
+There are 2 ways we can request for an update, one by using put method and another by patch method. 
+
+**Problem with *put* request** is that it will update the whole document even if we wanted to update the title only, It is meant to replace the whole document while **patch** will update only part which we intend to change.
+
+**Using put request**
+
+```javascript
+app.put('/posts/:title', async function(req, res) {
+    posts.updateOne(
+        {title: req.params.title},
+        {title: req.body.updatedTitle}
+    ).then(doc => {
+        res.send("Updated post " + doc);
+    }).catch(err => {
+        res.send("Some Error occured: " + err);
+    });
+});
+```
+
+
+
+**Using patch request**
+
+```javascript
+app.patch('/posts/:title', async function(req, res){
+    posts.updateOne(
+    	{title: req.params.title},
+        {title: req.body.updatedTitle}
+    ).then(doc => {
+        res.send("Updated post " + doc);
+    }).catch(err => {
+        res.send("Some Error occured: " + err);
+    });
+});
+```
+
+
+
 ## Middleware
 
 Middleware is something that happens between server receiving a request and sending back a response. Our get, post, delete etc. requests are middleware. **Middleware takes atmost 3 values** `req, res, next`. req is request server received, res is response server is returning back, next will be a function which can be used to call the next middleware. 
@@ -221,3 +286,45 @@ function authenticate(req, res, next) {
 ```
 
 In above code we are sending 2 middlewares in our get request. 1st one being authenticate and 2nd being function handling **req and res** for path `/`. 
+
+
+
+## Express parameters(Routing)
+
+Rounting can be defined as something to handle requests. [This](https://expressjs.com/en/guide/routing.html) post may be helpful to understand routing. Here we will talk about Route parameters.
+
+Route parameters are named URL segments that are used to capture the values specified at their position in the URL. The captured values are populated in the `req.params` object, with the name of the route parameter specified in the path as their respective keys.
+
+```javascript
+app.get('/users/:userId/books/:bookId', (req, res) => {
+	res.send(req.params.<userId>)
+})
+```
+
+This will handle all the requests with url as /users/**anyId**/books/**bookId**. This means we won't have to handle all different requests by creating a whole new get request handler. This will help getting rid of repetetive code.
+
+Anything can be filled at userId and bookId which can be handled accordingly in the node application.
+
+
+
+## Chainable Route Handlers
+
+Chainable route handlers are the ones targeting a single path but with different request types. Most of the times we have same request path but with different request types like `/articles` with `post, get, delete` requests. We create different route handlers for all these which makes things look ugly and hard to debug, that's where **Chainable Route Handlers** comes into existence.
+
+```javascript
+// Think we have a route path for /files with delete get and post request
+app.route("/files").get(
+		async function(req, res) {
+            res.send(getAllItems());
+        }
+	).post(
+        async function(req, res){
+            deleteAllItems();
+        }
+	).delete(
+		async function(req, res) {
+            deleteAllItems();
+        }	
+);
+```
+
